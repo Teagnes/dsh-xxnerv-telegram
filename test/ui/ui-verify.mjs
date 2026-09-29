@@ -212,6 +212,39 @@ if (pluginsLabel !== undefined) {
     return card === null ? 'not-found' : 'present';
   })()`)
   await shot('1-plugins-list')
+  // UI_PROBE_ADD_PLUGIN=1 records what the "add plugin" dialog accepts, so the
+  // install instructions in README describe the real control rather than a guess.
+  if (process.env.UI_PROBE_ADD_PLUGIN === '1') {
+    const dialog = await evaluate(session, `(() => {
+      const button = [...document.querySelectorAll('button')]
+        .find(b => ['添加插件', 'Add plugin', 'Add Plugin'].includes((b.textContent ?? '').trim()));
+      if (button === undefined) return { opened: false };
+      button.click();
+      return { opened: true };
+    })()`)
+    await sleep(1500)
+    if (dialog.opened) {
+      const form = await probe('add-plugin-dialog', `(() => {
+        const inputs = [...document.querySelectorAll('input, textarea, select')].map(el => ({
+          tag: el.tagName.toLowerCase(),
+          type: el.type ?? null,
+          id: el.id || null,
+          placeholder: el.placeholder || null,
+          ariaLabel: el.getAttribute('aria-label'),
+        }));
+        const body = document.body.innerText;
+        return { inputs, acceptsPath: /路径|path/i.test(body), acceptsPackage: /包名|package|npm|github/i.test(body), tail: body.slice(-500) };
+      })()`)
+      console.log(`ADD_PLUGIN ${JSON.stringify(form)}`)
+      await evaluate(session, `(() => {
+        const button = [...document.querySelectorAll('button')]
+          .find(b => ['取消', 'Cancel', '关闭', 'Close'].includes((b.textContent ?? '').trim()));
+        if (button !== undefined) button.click();
+        return true;
+      })()`)
+      await sleep(800)
+    }
+  }
   // The card's own View control names the package, which is a precise target;
   // falling back to the card itself keeps the step working if it is renamed.
   const labelsMatching = pattern => `[...document.querySelectorAll('button')]

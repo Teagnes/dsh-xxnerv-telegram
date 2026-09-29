@@ -42,6 +42,8 @@ NOTIFY_ON_TURN_END=false bash test/integration/run.sh tgtoolonly
 # UI 回环：无头 Chrome 打开真实客户端 → Plugins → Configure → 截图 + 保存断言
 bash test/ui/run.sh
 UI_SAVE_VALUE=@gui_test bash test/ui/run.sh
+# 额外探针：打开「添加插件」对话框并打印其输入控件（核对 README 的安装说明）
+UI_PROBE_ADD_PLUGIN=1 bash test/ui/run.sh
 
 # 真实链路（会真的发消息，需要 token）
 LIVE=1 DSH_XXNERV_TELEGRAM_BOT_TOKEN=... DSH_XXNERV_TELEGRAM_CHAT_ID=@chan \

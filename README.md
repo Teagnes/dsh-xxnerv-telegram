@@ -25,51 +25,61 @@
 
 ## 安装
 
+仓库：<https://github.com/Teagnes/dsh-xxnerv-telegram> · 包名：`dsh-xxnerv-telegram` · 许可证：MIT
+
 插件包就是一个 dsh **组合包**（bundle，`package.json` 里的 `dsh.bundle.patch` + `cordis.patch.yml` + 插件入口），安装即"把包加进 profile 依赖 + 把包名加进 `dsh.profile.bundles`"。
 
-前置：`git`；dsh（桌面版或 CLI 均可）；Node ≥ 22 只在跑测试时需要（插件本身零依赖）。下面用 `Teagnes/dsh-xxnerv-telegram` 指代本仓库在 GitHub 上的位置，命令里的 `<profile>` 换成你的 profile 名（如 `web` / `tui` / `desktop`）。
+前置：`git`；dsh（桌面版或 CLI 均可）。Node ≥ 22 只在跑测试时需要——插件零依赖、零构建，**源码即产物**。命令里的 `<profile>` 换成你的 profile 名（`web` / `tui` / 自定义）。
 
-### 方式 A：`dsh plugin`（任何非桌面 profile，推荐）
+### 方式 A：`dsh plugin`（任何由 CLI 管理的 profile，推荐）
+
+```sh
+# 从 GitHub 安装
+dsh plugin --profile <profile> add github:Teagnes/dsh-xxnerv-telegram
+
+# 锁到某个 tag / 分支
+dsh plugin --profile <profile> add github:Teagnes/dsh-xxnerv-telegram#v0.1.0
+
+# 升级 / 卸载
+dsh plugin --profile <profile> update
+dsh plugin --profile <profile> remove dsh-xxnerv-telegram
+```
 
 `dsh plugin --profile <name> <pnpm-args...>` 会把参数直接转给 profile 目录里的 pnpm，所以 pnpm 能装的 spec 都能用：
 
-```sh
-# 从 GitHub 安装（git 简写）
-dsh plugin --profile <profile> add github:Teagnes/dsh-xxnerv-telegram
+| 安装源 | 写法 | 何时用 |
+|---|---|---|
+| GitHub 简写 | `github:Teagnes/dsh-xxnerv-telegram` | 默认，走 HTTPS |
+| GitHub + tag/分支 | `github:Teagnes/dsh-xxnerv-telegram#v0.1.0` | 锁版本、锁定可复现的部署 |
+| 完整 git URL | `git+https://github.com/Teagnes/dsh-xxnerv-telegram.git` | 需要显式协议或私有镜像 |
+| SSH | `git+ssh://git@github.com/Teagnes/dsh-xxnerv-telegram.git` | 已配 SSH key、不想用 token |
+| 本地克隆目录 | `/path/to/dsh-xxnerv-telegram` | 改代码调试，改动即时生效 |
+| npm 包名 | `dsh-xxnerv-telegram` | 若该包已发布到 npm |
 
-# 等价写法
-dsh plugin --profile <profile> add git+https://github.com/Teagnes/dsh-xxnerv-telegram.git
-
-# 也可以装 npm 包名，或指向本地克隆目录
-dsh plugin --profile <profile> add dsh-xxnerv-telegram
-
-# 升级
-dsh plugin --profile <profile> update
-```
-
-从 git 安装时 pnpm 会执行 `prepare` 脚本；本包没有构建步骤，因此不会编译任何东西（源码即产物）。
+从 git 安装时 pnpm 会执行 `prepare` 脚本；本包没有构建步骤，因此不会编译任何东西。
 dsh 生成的 profile 在 `pnpm-workspace.yaml` 里设了 `nodeLinker: hoisted` 与 `autoInstallPeers: false`，
 所以 `@deepseek-ai/dsh-tools` / `@deepseek-ai/schemastery` 这两个 peer 依赖由 dsh 自身提供，不会被再装一份。
 
-### 方式 B：桌面版（profile 由应用独占，必须走 GUI）
+### 方式 B：桌面版（profile 由应用独占，走 GUI）
 
 desktop profile 由 Electron 应用独占管理，`dsh plugin --profile desktop ...` 会被拒绝
-（`profile "desktop" is managed exclusively by the Electron application`）。改用应用自带的 Plugins 页面：
+（`profile "desktop" is managed exclusively by the Electron application`）。用应用自带的 Plugins 页面：
 
-1. 先把仓库克隆到本地：`git clone https://github.com/Teagnes/dsh-xxnerv-telegram.git`
-2. 侧边栏 **Plugins → 从路径安装**，填入克隆出来的目录（GUI 支持**绝对路径**安装）。
-3. 安装后该 bundle 会自动启用；应用会自己维护 profile 的 `package.json`、`pnpm-lock.yaml` 与 bundle 列表，
-   后续升级（`git pull` 后重装）与卸载都在同一页面完成。
+1. 侧边栏 **Plugins → 添加插件**。
+2. 在「包名或地址」输入框里填 `github:Teagnes/dsh-xxnerv-telegram`
+   （该框接受**包名、GitHub 仓库地址或本地目录路径**；给仓库地址或 `https://github.com/Teagnes/dsh-xxnerv-telegram` 都可以）。
+3. 点击 **安装**；应用会自己维护 profile 的 `package.json`、`pnpm-lock.yaml` 与 bundle 列表。
+4. **重启 dsh**：组合在启动时计算，装完才生效。
 
-> 组合在启动时计算，**装完需要重启 dsh 桌面应用**才会生效。
+之后升级/卸载都在同一页面完成。
 
 ### 方式 C：手工落地（GUI/CLI 都不方便时）
 
 效果与上面等价，就是自己写好 profile 的依赖与 bundle 列表：
 
 ```sh
-PLUGIN_DIR=/path/to/dsh-xxnerv-telegram                       # 克隆出来的目录
-ln -s "$PLUGIN_DIR" "${DSH_HOME:-$HOME/.dsh}/profiles/<profile>/node_modules/dsh-xxnerv-telegram"
+git clone https://github.com/Teagnes/dsh-xxnerv-telegram.git /path/to/dsh-xxnerv-telegram
+ln -s /path/to/dsh-xxnerv-telegram "${DSH_HOME:-$HOME/.dsh}/profiles/<profile>/node_modules/dsh-xxnerv-telegram"
 ```
 
 `${DSH_HOME:-$HOME/.dsh}/profiles/<profile>/package.json`：
@@ -81,6 +91,16 @@ ln -s "$PLUGIN_DIR" "${DSH_HOME:-$HOME/.dsh}/profiles/<profile>/node_modules/dsh
 }
 ```
 
+### 升级
+
+| 安装方式 | 升级动作 |
+|---|---|
+| A：`dsh plugin` | `dsh plugin --profile <profile> update`；要换版本就把 `add` 的 spec 换成新的 tag（如 `…#v0.1.0`） |
+| B：桌面 GUI | Plugins 页面里卸载后按新地址/新 tag 重新安装 |
+| C：手工软链 | `git -C /path/to/dsh-xxnerv-telegram pull`，然后重启 dsh |
+
+升级后同样**重启一次**，组合才会重新计算。
+
 ### 验证加载
 
 ```sh
@@ -91,6 +111,7 @@ dsh --profile <profile> --dump-config
 desktop profile 由应用独占，CLI 连 `--dump-config` 都会拒绝；要验证就用一份逐字拷贝，或先用
 `dsh <name> --from-default-profile <template>` 新建一个 profile。bundle 被跳过时会打印
 `skipping profile bundle ...` 并给出原因（兼容性门禁不满足 / 找不到包）。
+
 
 
 ## 配置

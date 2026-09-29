@@ -17,8 +17,12 @@
   通用回退名）。0.1.0 条目已按最终命名改写——该版本尚未对外发布，改名发生在首次发布之前。
   升级提示：已安装的 profile 需同步改软链名、依赖键、`dsh.profile.bundles` 条目与配置行的
   `id` / `name`（配置内容不变），然后重启 dsh。
-- 安装说明改为以 GitHub 仓库为准（`dsh plugin --profile <p> add github:Teagnes/dsh-xxnerv-telegram`、
-  GUI 从克隆目录安装、手工软链），文档中不再出现任何本机绝对路径或用户专属凭据。
+- 安装说明改为以已发布的仓库地址为基准（<https://github.com/Teagnes/dsh-xxnerv-telegram>）：把安装源整理成
+  GitHub 简写 / tag 锁定 / 完整 URL / SSH / 本地目录 / npm 包名六种规范写法，补「升级」对照表；桌面版的
+  GUI 流程按实测的「添加插件 → 包名或地址」对话框重写（该框接受包名、GitHub 仓库地址或本地目录路径）。
+  文档中不再出现作者本机的绝对路径或用户专属凭据。
+- UI 测试新增 `UI_PROBE_ADD_PLUGIN=1` 探针：打开「添加插件」对话框并记录其输入控件，用于核对安装说明
+  与实际界面一致（默认关闭，不影响常规断言）。
 - 集成测试的 probe overlay 改为运行期生成（此前 `test/integration/probe.patch.yml` 硬编码了作者的
   绝对路径，clone 后必然失败）；该文件已删除。
 - UI 测试脚本的沙箱 fixture 由真实频道改为 `@your_channel`，并新增 `DSH_DESKTOP_PATCH` 覆盖项
