@@ -23,6 +23,9 @@
   文档中不再出现作者本机的绝对路径或用户专属凭据。
 - UI 测试新增 `UI_PROBE_ADD_PLUGIN=1` 探针：打开「添加插件」对话框并记录其输入控件，用于核对安装说明
   与实际界面一致（默认关闭，不影响常规断言）。
+- 安装说明补上实测得到的前提与行为：`dsh plugin` 需要 PATH 上有 **pnpm**（否则报 `pnpm was not found`）；
+  安装成功后 dsh 会自动写入依赖并追加 `dsh.profile.bundles`；pnpm 的 peer 依赖警告属预期；
+  首次从 git 安装需克隆仓库（约 1–2 分钟）。
 - 集成测试的 probe overlay 改为运行期生成（此前 `test/integration/probe.patch.yml` 硬编码了作者的
   绝对路径，clone 后必然失败）；该文件已删除。
 - UI 测试脚本的沙箱 fixture 由真实频道改为 `@your_channel`，并新增 `DSH_DESKTOP_PATCH` 覆盖项

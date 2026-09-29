@@ -29,7 +29,9 @@
 
 插件包就是一个 dsh **组合包**（bundle，`package.json` 里的 `dsh.bundle.patch` + `cordis.patch.yml` + 插件入口），安装即"把包加进 profile 依赖 + 把包名加进 `dsh.profile.bundles`"。
 
-前置：`git`；dsh（桌面版或 CLI 均可）。Node ≥ 22 只在跑测试时需要——插件零依赖、零构建，**源码即产物**。命令里的 `<profile>` 换成你的 profile 名（`web` / `tui` / 自定义）。
+前置：`git`、**pnpm**（`dsh plugin` 会调用 PATH 上的 pnpm；缺失时 dsh 会直接报
+`pnpm was not found; install pnpm and make it available on PATH`）、dsh（桌面版或 CLI 均可）。
+Node ≥ 22 只在跑测试时需要——插件零依赖、零构建，**源码即产物**。命令里的 `<profile>` 换成你的 profile 名（`web` / `tui` / 自定义）。
 
 ### 方式 A：`dsh plugin`（任何由 CLI 管理的 profile，推荐）
 
@@ -59,6 +61,16 @@ dsh plugin --profile <profile> remove dsh-xxnerv-telegram
 从 git 安装时 pnpm 会执行 `prepare` 脚本；本包没有构建步骤，因此不会编译任何东西。
 dsh 生成的 profile 在 `pnpm-workspace.yaml` 里设了 `nodeLinker: hoisted` 与 `autoInstallPeers: false`，
 所以 `@deepseek-ai/dsh-tools` / `@deepseek-ai/schemastery` 这两个 peer 依赖由 dsh 自身提供，不会被再装一份。
+因此安装时 pnpm 打出 `Issues with peer dependencies found` 是**预期**的，可以忽略。
+
+安装完成后 `dsh plugin` 会自动写好两处：`package.json` 的 `dependencies` 与 `dsh.profile.bundles`
+（已实测：`add github:Teagnes/dsh-xxnerv-telegram#v0.1.0` 后 profile patch 出现
+`# == dsh-xxnerv-telegram` 层与 `id: xxnerv-telegram` 行，无 `skipping profile bundle`）。
+首次从 git 安装要克隆仓库，约 1–2 分钟，取决于网络。
+
+> 若 pnpm 提示 git 安装的构建脚本被拦截（`allowBuilds` / `onlyBuiltDependencies`），
+> 按提示的键名加进 `${DSH_HOME:-$HOME/.dsh}/profiles/<profile>/pnpm-workspace.yaml` 再重跑即可。
+> 本包没有任何构建脚本，实测无需额外许可。
 
 ### 方式 B：桌面版（profile 由应用独占，走 GUI）
 
