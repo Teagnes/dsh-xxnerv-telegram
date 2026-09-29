@@ -66,7 +66,7 @@ dsh 生成的 profile 在 `pnpm-workspace.yaml` 里设了 `nodeLinker: hoisted` 
 安装完成后 `dsh plugin` 会自动写好两处：`package.json` 的 `dependencies` 与 `dsh.profile.bundles`
 （已实测：`add github:Teagnes/dsh-xxnerv-telegram#v0.1.0` 后 profile patch 出现
 `# == dsh-xxnerv-telegram` 层与 `id: xxnerv-telegram` 行，无 `skipping profile bundle`）。
-首次从 git 安装要克隆仓库，约 1–2 分钟，取决于网络。
+首次从 git 安装要下载仓库 tarball：**直连 GitHub 不通时约 1.5–4 分钟，配好代理后 6 秒左右**（见下面的「GitHub 连接超时」）。
 
 > 若 pnpm 提示 git 安装的构建脚本被拦截（`allowBuilds` / `onlyBuiltDependencies`），
 > 按提示的键名加进 `${DSH_HOME:-$HOME/.dsh}/profiles/<profile>/pnpm-workspace.yaml` 再重跑即可。
@@ -102,6 +102,43 @@ ln -s /path/to/dsh-xxnerv-telegram "${DSH_HOME:-$HOME/.dsh}/profiles/<profile>/n
   "dsh": { "profile": { "bundles": [ "...", "dsh-xxnerv-telegram" ] } }
 }
 ```
+
+### GitHub 连接超时（安装直接失败）
+
+dsh 在开始安装前会做一次 **5 秒**的 GitHub 连通性预检（内部就是 `git -c credential.helper= ls-remote <repo> HEAD`，使用 profile 的 git 配置与代理设置）；**超时会中止安装**，报：
+
+```
+dsh: connection to github.com timed out after 5000ms
+```
+
+直连 GitHub 不通时（本机实测：直连 12s 超时，走本机代理 2.6s），需要配置**两条不同的链路**——只配一条不够：
+
+| 链路 | 由谁发起 | 配置位置 |
+|---|---|---|
+| 5 秒预检 + git 依赖解析 | 系统 `git` | `~/.gitconfig` 的 `http.https://github.com.proxy` |
+| pnpm 拉取仓库 tarball（codeload.github.com） | pnpm 自己的 HTTPS | profile 的 `pnpm-workspace.yaml`（**不是** `.npmrc`） |
+
+```sh
+# 1) git：只让 github.com 的 https 走代理
+git config --global http.https://github.com.proxy http://127.0.0.1:7897
+git ls-remote https://github.com/Teagnes/dsh-xxnerv-telegram.git    # 应很快返回
+
+# 2) pnpm：追加到 profile 的 pnpm-workspace.yaml（pnpm 11 的设置文件）
+cat >> "${DSH_HOME:-$HOME/.dsh}/profiles/<profile>/pnpm-workspace.yaml" <<'EOF'
+
+proxy: http://127.0.0.1:7897
+https-proxy: http://127.0.0.1:7897
+noproxy: localhost,127.0.0.1
+EOF
+```
+
+实测效果：同一条 `pnpm add github:Teagnes/dsh-xxnerv-telegram`，配置前 **1m46s～3m36s**（并伴随预检超时失败），配置后 **6s**；预检命令本身从 75s 失败降到 2.2s。
+
+> 两个常见误区：
+> - **在 shell 里 `export HTTPS_PROXY` 无效**：dsh 给预检与 pnpm 的是 scrub 过的环境（`extendEnv: false`），父进程环境变量传不进去，必须落到 git 配置与 profile 的 `pnpm-workspace.yaml`。
+> - **profile 级 `.npmrc` 无效**：pnpm 11 的设置在 `pnpm-workspace.yaml`；实测 profile 里 `.npmrc` 的 `proxy` / `fetch-retries` 读出来都是 `undefined`（`~/.npmrc` 只影响 registry，国内通常已指向 npmmirror，与 GitHub 无关）。
+
+其它办法：用 SSH 绕开 HTTPS（`git config --global url."git@github.com:".insteadOf "https://github.com/"`，需要已配 SSH key；注意预检只有 5s 预算，本机实测 SSH 反而要 6.9s）；或者干脆走上面的**方式 C**用本地目录安装，完全不碰 GitHub。
 
 ### 升级
 
@@ -317,6 +354,7 @@ LIVE=1 DSH_XXNERV_TELEGRAM_BOT_TOKEN=... DSH_XXNERV_TELEGRAM_CHAT_ID=@chan \
 
 | 现象 | 原因与修法 |
 |---|---|
+| 安装时报 `dsh: connection to github.com timed out after 5000ms` | 5 秒 GitHub 预检失败会**中止安装**：按上面「GitHub 连接超时」给 git 与 pnpm 各配一次代理；或改用本地目录安装（方式 C） |
 | `telegram request timed out ... set the plugin's proxyUrl` | 本机直连不通 Telegram，填 `proxyUrl`（本机系统代理是 `http://127.0.0.1:7897`） |
 | `telegram getMe failed (HTTP 401): Unauthorized` | token 错或已失效 |
 | `Bad Request: chat not found` | chat id / 用户名错，或 bot 不在该群/频道里（频道需把 bot 设为管理员） |

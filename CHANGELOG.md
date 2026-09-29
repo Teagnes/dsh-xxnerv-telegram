@@ -25,7 +25,12 @@
   与实际界面一致（默认关闭，不影响常规断言）。
 - 安装说明补上实测得到的前提与行为：`dsh plugin` 需要 PATH 上有 **pnpm**（否则报 `pnpm was not found`）；
   安装成功后 dsh 会自动写入依赖并追加 `dsh.profile.bundles`；pnpm 的 peer 依赖警告属预期；
-  首次从 git 安装需克隆仓库（约 1–2 分钟）。
+  从 git 安装要下载仓库 tarball，未配代理时约 1.5–4 分钟（代理配置见下一条）。
+- 安装说明新增「GitHub 连接超时（安装直接失败）」一节：讲清 dsh 的 5 秒预检（
+  `git ls-remote`，超时会**中止安装**）与 pnpm 拉 codeload tarball 是两条链路，需要分别给
+  `~/.gitconfig` 与 profile 的 `pnpm-workspace.yaml` 配代理；并记录两个反直觉结论——shell 里
+  `export HTTPS_PROXY` 无效（子进程环境被 scrub）、profile 级 `.npmrc` 无效（pnpm 11 读
+  `pnpm-workspace.yaml`）。实测：安装 1m46s～3m36s → 6s，预检 75s 失败 → 2.2s。
 - 集成测试的 probe overlay 改为运行期生成（此前 `test/integration/probe.patch.yml` 硬编码了作者的
   绝对路径，clone 后必然失败）；该文件已删除。
 - UI 测试脚本的沙箱 fixture 由真实频道改为 `@your_channel`，并新增 `DSH_DESKTOP_PATCH` 覆盖项
