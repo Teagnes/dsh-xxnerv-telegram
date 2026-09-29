@@ -1,0 +1,17 @@
+# Bundle patch layer of `dsh-xxnerv-telegram`.
+#
+# Applied when a profile lists this package in `dsh.profile.bundles`, before the
+# profile's own `cordis.patch.yml`. Every field is optional here: the plugin's
+# Schemastery Config fills unset fields with its defaults, so a profile
+# overrides only what its deployment needs by targeting the `telegram` row:
+#
+#   - id: xxnerv-telegram
+#     name: 'dsh-xxnerv-telegram'
+#     config:
+#       botToken: '123456:ABC...'
+#       defaultChatId: '123456789'
+#       proxyUrl: 'http://127.0.0.1:7897'
+#       notifyOnTurnEnd: true
+- insert:
+    - id: xxnerv-telegram
+      name: 'dsh-xxnerv-telegram'

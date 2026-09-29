@@ -1,0 +1,24 @@
+name: ci
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: ['22', '24']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      # The plugin has no runtime or dev dependencies, so there is nothing to
+      # install: the unit suite runs against the sources directly.
+      - run: node --test test/*.test.mjs
+
+  # The integration and UI suites need a local DeepSeek Harness desktop install
+  # (and Chrome), so they are not run here; see CONTRIBUTING.md to run them.

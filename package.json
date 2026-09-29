@@ -1,0 +1,55 @@
+{
+  "name": "dsh-xxnerv-telegram",
+  "version": "0.1.0",
+  "description": "Send Telegram messages from DeepSeek Harness: xxnerv_telegram_send and xxnerv_telegram_config tools, turn-end notifications, a Plugins-page configuration form, and an operator CLI.",
+  "license": "MIT",
+  "keywords": [
+    "dsh",
+    "deepseek-harness",
+    "telegram",
+    "bot",
+    "plugin",
+    "notifications"
+  ],
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
+    "./telegram": "./lib/telegram.js",
+    "./config": "./lib/config.js",
+    "./package.json": "./package.json"
+  },
+  "bin": {
+    "dsh-xxnerv-telegram": "./bin/tg.mjs"
+  },
+  "files": [
+    "lib",
+    "bin",
+    "cordis.patch.yml",
+    "README.md",
+    "CHANGELOG.md"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.mjs"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/dsh-tools": ">=0.1.7-rc.2",
+    "@deepseek-ai/schemastery": ">=3.18.0"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": [
+        "@deepseek-ai/dsh-client-locale",
+        "@deepseek-ai/dsh-client-ui-settings"
+      ]
+    }
+  }
+}

@@ -1,0 +1,14 @@
+# Dependencies (this package has none; the linked profile install creates this)
+node_modules/
+
+# Local scratch: test sandboxes, probes, and profile backups
+.scratch/
+
+# Build/test leftovers
+*.log
+coverage/
+.DS_Store
+
+# Never commit a real bot token or a profile patch containing one
+cordis.patch.local.yml
+.env
