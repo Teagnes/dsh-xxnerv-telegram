@@ -12,3 +12,6 @@ coverage/
 # Never commit a real bot token or a profile patch containing one
 cordis.patch.local.yml
 .env
+
+# pnpm local store (created when a sandbox install runs inside the checkout)
+.pnpm-store/
