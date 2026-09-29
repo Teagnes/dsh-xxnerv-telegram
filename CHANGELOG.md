@@ -17,7 +17,7 @@
   通用回退名）。0.1.0 条目已按最终命名改写——该版本尚未对外发布，改名发生在首次发布之前。
   升级提示：已安装的 profile 需同步改软链名、依赖键、`dsh.profile.bundles` 条目与配置行的
   `id` / `name`（配置内容不变），然后重启 dsh。
-- 安装说明改为以 GitHub 仓库为准（`dsh plugin --profile <p> add github:<owner>/dsh-xxnerv-telegram`、
+- 安装说明改为以 GitHub 仓库为准（`dsh plugin --profile <p> add github:Teagnes/dsh-xxnerv-telegram`、
   GUI 从克隆目录安装、手工软链），文档中不再出现任何本机绝对路径或用户专属凭据。
 - 集成测试的 probe overlay 改为运行期生成（此前 `test/integration/probe.patch.yml` 硬编码了作者的
   绝对路径，clone 后必然失败）；该文件已删除。
@@ -33,6 +33,8 @@
 - 项目级文档：[CONTRIBUTING.md](CONTRIBUTING.md)、[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)、
   [AGENTS.md](AGENTS.md)、[CHANGELOG.md](CHANGELOG.md)、[LICENSE](LICENSE)（MIT）、`.gitignore`。
 - GitHub Actions 单测流水线：Node 22 / 24 上跑 `node --test test/*.test.mjs`（零依赖，秒级完成）。
+- 仓库发布到 GitHub：[Teagnes/dsh-xxnerv-telegram](https://github.com/Teagnes/dsh-xxnerv-telegram)（public，MIT）。
+  README 顶部加 CI 徽章，安装命令与克隆地址改为真实仓库，`package.json` 补 `repository` / `homepage` / `bugs`。
 
 ## [0.1.0] - 2026-09-29
 

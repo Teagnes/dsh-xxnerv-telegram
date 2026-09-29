@@ -3,6 +3,14 @@
   "version": "0.1.0",
   "description": "Send Telegram messages from DeepSeek Harness: xxnerv_telegram_send and xxnerv_telegram_config tools, turn-end notifications, a Plugins-page configuration form, and an operator CLI.",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Teagnes/dsh-xxnerv-telegram.git"
+  },
+  "homepage": "https://github.com/Teagnes/dsh-xxnerv-telegram#readme",
+  "bugs": {
+    "url": "https://github.com/Teagnes/dsh-xxnerv-telegram/issues"
+  },
   "keywords": [
     "dsh",
     "deepseek-harness",

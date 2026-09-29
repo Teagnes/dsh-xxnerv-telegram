@@ -1,5 +1,7 @@
 # dsh-xxnerv-telegram
 
+[![ci](https://github.com/Teagnes/dsh-xxnerv-telegram/actions/workflows/ci.yml/badge.svg)](https://github.com/Teagnes/dsh-xxnerv-telegram/actions/workflows/ci.yml)
+
 给 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness)（dsh）用的 Telegram 插件。它向 dsh 贡献四件事：
 
 1. **`xxnerv_telegram_send` 工具** —— 模型可调用，把一条文本消息发到指定会话。
@@ -25,7 +27,7 @@
 
 插件包就是一个 dsh **组合包**（bundle，`package.json` 里的 `dsh.bundle.patch` + `cordis.patch.yml` + 插件入口），安装即"把包加进 profile 依赖 + 把包名加进 `dsh.profile.bundles`"。
 
-前置：`git`；dsh（桌面版或 CLI 均可）；Node ≥ 22 只在跑测试时需要（插件本身零依赖）。下面用 `<owner>/dsh-xxnerv-telegram` 指代本仓库在 GitHub 上的位置，命令里的 `<profile>` 换成你的 profile 名（如 `web` / `tui` / `desktop`）。
+前置：`git`；dsh（桌面版或 CLI 均可）；Node ≥ 22 只在跑测试时需要（插件本身零依赖）。下面用 `Teagnes/dsh-xxnerv-telegram` 指代本仓库在 GitHub 上的位置，命令里的 `<profile>` 换成你的 profile 名（如 `web` / `tui` / `desktop`）。
 
 ### 方式 A：`dsh plugin`（任何非桌面 profile，推荐）
 
@@ -33,10 +35,10 @@
 
 ```sh
 # 从 GitHub 安装（git 简写）
-dsh plugin --profile <profile> add github:<owner>/dsh-xxnerv-telegram
+dsh plugin --profile <profile> add github:Teagnes/dsh-xxnerv-telegram
 
 # 等价写法
-dsh plugin --profile <profile> add git+https://github.com/<owner>/dsh-xxnerv-telegram.git
+dsh plugin --profile <profile> add git+https://github.com/Teagnes/dsh-xxnerv-telegram.git
 
 # 也可以装 npm 包名，或指向本地克隆目录
 dsh plugin --profile <profile> add dsh-xxnerv-telegram
@@ -54,7 +56,7 @@ dsh 生成的 profile 在 `pnpm-workspace.yaml` 里设了 `nodeLinker: hoisted` 
 desktop profile 由 Electron 应用独占管理，`dsh plugin --profile desktop ...` 会被拒绝
 （`profile "desktop" is managed exclusively by the Electron application`）。改用应用自带的 Plugins 页面：
 
-1. 先把仓库克隆到本地：`git clone https://github.com/<owner>/dsh-xxnerv-telegram.git`
+1. 先把仓库克隆到本地：`git clone https://github.com/Teagnes/dsh-xxnerv-telegram.git`
 2. 侧边栏 **Plugins → 从路径安装**，填入克隆出来的目录（GUI 支持**绝对路径**安装）。
 3. 安装后该 bundle 会自动启用；应用会自己维护 profile 的 `package.json`、`pnpm-lock.yaml` 与 bundle 列表，
    后续升级（`git pull` 后重装）与卸载都在同一页面完成。
